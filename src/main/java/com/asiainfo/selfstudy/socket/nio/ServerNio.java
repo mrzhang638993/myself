@@ -34,7 +34,7 @@ public class ServerNio {
                    SocketChannel client = server.accept();
                     client.configureBlocking(false);
                     //  监听客户端发送到信息的。
-                    client.register(selector, SelectionKey.OP_WRITE);
+                    client.register(selector, SelectionKey.OP_READ);
                 } else if (selectionKey.isValid() && selectionKey.isReadable()) {
                     SocketChannel client = (SocketChannel) selectionKey.channel();
                     System.out.println("收到来自客户端的请求信息的");
