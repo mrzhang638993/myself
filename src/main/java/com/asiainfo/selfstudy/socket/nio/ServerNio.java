@@ -38,9 +38,11 @@ public class ServerNio {
                 } else if (selectionKey.isValid() && selectionKey.isReadable()) {
                     SocketChannel client = (SocketChannel) selectionKey.channel();
                     System.out.println("收到来自客户端的请求信息的");
+                    client.configureBlocking(false);
                     client.register(selector, SelectionKey.OP_WRITE);
                 } else if (selectionKey.isValid() && selectionKey.isWritable()) {
                     SocketChannel client = (SocketChannel) selectionKey.channel();
+                    client.configureBlocking(false);
                     //ServerSocketChannel server = (ServerSocketChannel) selectionKey.channel();
                     //SocketChannel client = server.accept();
                     //  执行相关的监听的处理机制的
