@@ -10,7 +10,7 @@ public class BioClient {
         //  连接服务器
         Socket socket = new Socket("127.0.0.1", 20000);
 
-        while (true) {
+        //while (true) {
             OutputStream os = socket.getOutputStream();
             String message="客户端连接服务端成功，开始发送客户端信息：bye";
             os.write(message.getBytes());
@@ -27,5 +27,5 @@ public class BioClient {
                 }
             }
         }
-    }
+    //}
 }
