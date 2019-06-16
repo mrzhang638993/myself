@@ -15,30 +15,24 @@ public class ClientNio {
         SocketChannel client = SocketChannel.open();
         client.configureBlocking(false);
         Selector selector = Selector.open();
-        boolean  connect= client.connect(new InetSocketAddress("localhost", 20001));
+        //  不断的重新连接的话，会导致之前的连接挂起的操作的
+        client.register(selector,SelectionKey.OP_CONNECT);
+        client.connect(new InetSocketAddress("localhost", 20001));
             //  开始获取到服务端的时间通知的
             while (true) {
-                if (connect){
-                    ByteBuffer sendbuffer = ByteBuffer.allocate(1024);
-                    sendbuffer.put("QUERY TIME ORDER".getBytes());
-                    sendbuffer.flip();
-                    //向Channel中写入客户端的请求指令  写到服务端
-                    client.write(sendbuffer);
-                    if(!sendbuffer.hasRemaining()){
-                        System.out.println("Send order to server succeed.");
-                    }
-                    selector.select(1000);
+                    selector.select();
                     Set<SelectionKey> selectionKeys = selector.selectedKeys();
                     Iterator<SelectionKey> iterator = selectionKeys.iterator();
                     while (iterator.hasNext()) {
                         SelectionKey selectionKey = iterator.next();
                         iterator.remove();
-                        SocketChannel server = (SocketChannel) selectionKey.channel();
                         if (selectionKey.isValid() && selectionKey.isReadable()) {
+                            SocketChannel server = (SocketChannel) selectionKey.channel();
                             //  对应的是服务端的信息是可以读取的操作的。
                             System.out.println("获取到了服务端的信息的");
                             server.register(selector,SelectionKey.OP_WRITE);
                         } else if (selectionKey.isValid() && selectionKey.isWritable()) {
+                            SocketChannel server = (SocketChannel) selectionKey.channel();
                             //  对应的通道是可以写的。
                             server.register(selector,SelectionKey.OP_READ);
                             String message = "客户端执行写操作了，告知服务端信息的";
@@ -48,5 +42,5 @@ public class ClientNio {
                     }
                 }
             }
-    }
+   // }
 }
