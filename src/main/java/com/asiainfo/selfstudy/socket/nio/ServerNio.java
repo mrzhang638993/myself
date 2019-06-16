@@ -48,9 +48,6 @@ public class ServerNio {
                 } else if (selectionKey.isValid() && selectionKey.isWritable()) {
                     ServerSocketChannel server = (ServerSocketChannel) selectionKey.channel();
                     SocketChannel client = server.accept();
-                    String message = "客户端执行写操作了，告知服务端信息的";
-                    ByteBuffer byteBuffer = ByteBuffer.wrap(message.getBytes());
-                    client.write(byteBuffer);
                     client.register(selector, SelectionKey.OP_READ);
                 }
             }
