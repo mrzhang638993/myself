@@ -8,6 +8,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -28,26 +29,27 @@ public class ServerNio {
                 SelectionKey selectionKey = iterator.next();
                 iterator.remove();
                 if (selectionKey.isValid() && selectionKey.isAcceptable()) {
+                    //  注意此处的区别的
                     ServerSocketChannel server = (ServerSocketChannel) selectionKey.channel();
-                    SocketChannel client = server.accept();
-                    //*SocketChannel accept = server.accept();*//*
+                   SocketChannel client = server.accept();
                     client.configureBlocking(false);
                     //  监听客户端发送到信息的。
                     client.register(selector, SelectionKey.OP_WRITE);
                 } else if (selectionKey.isValid() && selectionKey.isReadable()) {
-                    ServerSocketChannel server = (ServerSocketChannel) selectionKey.channel();
-                    SocketChannel client = server.accept();
-                    //  读取客户端发送的信息的
-                    ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4096);
-                    int len = 0;
-                    while ((len = client.read(byteBuffer)) != 0) {
-                        System.out.println(new String(byteBuffer.array()));
-                    }
-                    //  需要注册告诉服务端，现在可以执行读操作的。
+                    SocketChannel client = (SocketChannel) selectionKey.channel();
+                    System.out.println("收到来自客户端的请求信息的");
                     client.register(selector, SelectionKey.OP_WRITE);
                 } else if (selectionKey.isValid() && selectionKey.isWritable()) {
-                    ServerSocketChannel server = (ServerSocketChannel) selectionKey.channel();
-                    SocketChannel client = server.accept();
+                    SocketChannel client = (SocketChannel) selectionKey.channel();
+                    //ServerSocketChannel server = (ServerSocketChannel) selectionKey.channel();
+                    //SocketChannel client = server.accept();
+                    //  执行相关的监听的处理机制的
+                  /*  ByteBuffer sendbuffer = ByteBuffer.allocate(1024);
+                    sendbuffer.put(new Date(System.currentTimeMillis()).toString() .getBytes());
+                    sendbuffer.flip();*/
+                    //将客户端响应消息写入到客户端Channel中。
+                   /* client.write(sendbuffer);*/
+                    System.out.println("给客户端发送数据文件的");
                     client.register(selector, SelectionKey.OP_READ);
                 }
             }

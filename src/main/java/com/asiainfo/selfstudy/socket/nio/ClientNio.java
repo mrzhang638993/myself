@@ -3,6 +3,7 @@ package com.asiainfo.selfstudy.socket.nio;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -19,7 +20,7 @@ public class ClientNio {
         client.register(selector,SelectionKey.OP_CONNECT);
         client.connect(new InetSocketAddress("localhost", 20001));
             //  开始获取到服务端的时间通知的
-            while (true) {
+          while (true) {
                     selector.select();
                     Set<SelectionKey> selectionKeys = selector.selectedKeys();
                     Iterator<SelectionKey> iterator = selectionKeys.iterator();
@@ -35,13 +36,21 @@ public class ClientNio {
                         } else if (selectionKey.isValid() && selectionKey.isWritable()) {
                             SocketChannel server = (SocketChannel) selectionKey.channel();
                             //  对应的通道是可以写的。
-                            String message = "客户端执行写操作了，告知服务端信息的";
+                          /*  String message = "客户端执行写操作了，告知服务端信息的";
                             ByteBuffer byteBuffer = ByteBuffer.wrap(message.getBytes());
-                            server.write(byteBuffer);
+                            byteBuffer.flip();
+                            server.write(byteBuffer);*/
+                            System.out.println("给服务端发送消息请求的");
                             server.register(selector,SelectionKey.OP_READ);
+                        }else if(selectionKey.isValid() && selectionKey.isConnectable()){
+                            //  对应的是处于连接的状态的
+                            SocketChannel server = (SocketChannel) selectionKey.channel();
+                            if (server.finishConnect()){
+                                server.register(selector,SelectionKey.OP_WRITE);
+                            }
                         }
                     }
                 }
-            }
+          }
    // }
 }
