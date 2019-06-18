@@ -29,27 +29,35 @@ public class ClientNio {
                         iterator.remove();
                         if (selectionKey.isValid() && selectionKey.isReadable()) {
                             SocketChannel server = (SocketChannel) selectionKey.channel();
-                            server.configureBlocking(false);
                             //  对应的是服务端的信息是可以读取的操作的。
-                            System.out.println("获取到了服务端的信息的");
-                            // 給服務端返回信息
+                            ByteBuffer  byteBuffer=  ByteBuffer.allocate(1024);
+                            int length=0;
+                            while ((length=client.read(byteBuffer))>0){
+                               // if (byteBuffer.position()==0) break;
+                            }
+                            //if (byteBuffer.position() == 0) break;
+                            byteBuffer.flip();
+                            //  处理需要多次读取的问题的，使用长度一次性的读取的
+                            byte[] content = new byte[byteBuffer.remaining()];
+                            byteBuffer.get(content);
+                            System.out.println(new String(content));
+                            String  message=new String(content);
+                            System.out.println(message);
                            server.register(selector,SelectionKey.OP_WRITE);
                         } else if (selectionKey.isValid() && selectionKey.isWritable()) {
                             SocketChannel server = (SocketChannel) selectionKey.channel();
-                            server.configureBlocking(false);
-                            //  对应的通道是可以写的。
-                          /*  String message = "客户端执行写操作了，告知服务端信息的";
-                            ByteBuffer byteBuffer = ByteBuffer.wrap(message.getBytes());
-                            byteBuffer.flip();
-                            server.write(byteBuffer);*/
-                            System.out.println("给服务端发送消息请求的");
-                            server.register(selector,SelectionKey.OP_READ);
+                            String message = "客户端执行写操作了，告知服务端信息的";
+                            ByteBuffer  byteBuffer=ByteBuffer.wrap(message.getBytes());
+                            while (byteBuffer.hasRemaining()){
+                                server.write(byteBuffer);
+                            }
+                           server.register(selector,SelectionKey.OP_READ);
                         }else if(selectionKey.isValid() && selectionKey.isConnectable()){
-                            //  对应的是处于连接的状态的
                             SocketChannel server = (SocketChannel) selectionKey.channel();
-                            server.configureBlocking(false);
+                            //  客户端已经和服务端创建了连接的
                             if (server.finishConnect()){
-                                server.register(selector,SelectionKey.OP_WRITE);
+                                //  监听连接的读
+                                selectionKey.interestOps(SelectionKey.OP_WRITE);
                             }
                         }
                     }

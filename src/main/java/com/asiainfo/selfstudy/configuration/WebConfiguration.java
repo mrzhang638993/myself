@@ -1,6 +1,6 @@
 package com.asiainfo.selfstudy.configuration;
 
-import com.asiainfo.selfstudy.utils.DateFormat;
+//import com.asiainfo.selfstudy.utils.DateFormat;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -27,7 +27,8 @@ public class WebConfiguration implements WebMvcConfigurer {
     // 增加格式化的相关操作
     @Override
     public void addFormatters(FormatterRegistry registry) {
-        registry.addFormatter(new DateFormat("yyyy-MM-dd  HH:mm:ss"));
+       // registry.addFormatter(new DateFormat("yyyy-MM-dd  HH:mm:ss"));
+       // registry.addFormatter(new F);
     }
 
     // 增加视图控制
